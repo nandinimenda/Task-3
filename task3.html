@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz & Giggles Zone</title>
+  <link rel="stylesheet" href="task3.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz & Giggles Zone</h1>
+    <p class="subtitle">Test your knowledge and brighten your day</p>
+
+    <!-- Quiz Section -->
+    <div class="card" id="quiz-card">
+      <h2>Brain Teaser Central</h2>
+      <p>Challenge yourself with our interactive knowledge quiz</p>
+      <p id="question" class="question" aria-live="polite"></p>
+      <div id="options" class="options"></div>
+      <button id="next-btn" class="next-btn" type="button" disabled>Next →</button>
+      <p id="score" class="score"></p>
+    </div>
+
+    <!-- Joke Section -->
+    <div class="card">
+      <h2>Daily Dose of Humor</h2>
+      <p>Fresh jokes delivered to tickle your funny bone</p>
+      <p id="joke-q" class="joke-question">How do you organize a space party?</p>
+      <p id="joke-a" class="joke-answer">You planet</p>
+      <button class="joke-btn" type="button" onclick="getAnotherJoke()">Get another joke 🥲</button>
+    </div>
+  </div>
+
+  <script src="task3.js"></script>
+</body>
+</html>
+
+#css
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to bottom right, #e0f2fe, #f3e8ff);
+  color: #1e293b;
+}
+
+.container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #4f46e5;
+}
+
+.subtitle {
+  margin-bottom: 30px;
+  color: #4b5563;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.card h2 {
+  color: #111827;
+  margin-top: 0;
+}
+
+.question {
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.score {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #0d9488;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.options button {
+  padding: 10px 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.options button:hover {
+  background: #dbeafe;
+}
+
+.options button.selected {
+  background: #bbf7d0;
+  border-color: #4ade80;
+}
+
+.next-btn,
+.joke-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.next-btn {
+  background: #3b82f6;
+}
+
+.next-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.next-btn:hover:not(:disabled),
+.joke-btn:hover {
+  opacity: 0.9;
+}
+
+.joke-btn {
+  background: #f97316;
+}
+
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .options button {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+}
+
+#js
+const quizData = [
+  {
+    question: "Which language runs in a web browser?",
+    options: ["Java", "C", "Python", "JavaScript"],
+    answer: 3
+  },
+  {
+    question: "What does CSS stand for?",
+    options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Styling Sheet", "Colorful Style Scripts"],
+    answer: 1
+  },
+  {
+    question: "Which tag is used for a link in HTML?",
+    options: ["<a>", "<link>", "<href>", "<src>"],
+    answer: 0
+  },
+  {
+    question: "Which company developed JavaScript?",
+    options: ["Google", "Mozilla", "Netscape", "Microsoft"],
+    answer: 2
+  }
+];
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const nextBtn = document.getElementById("next-btn");
+const scoreEl = document.getElementById("score");
+
+let currentQuestion = 0;
+let score = 0;
+let selectedOption = null;
+
+function loadQuestion() {
+  const current = quizData[currentQuestion];
+  questionEl.textContent = current.question;
+  optionsEl.innerHTML = "";
+  nextBtn.disabled = true;
+  selectedOption = null;
+
+  current.options.forEach((opt, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.addEventListener("click", () => {
+      selectOption(index, btn);
+    });
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectOption(index, button) {
+  const allButtons = optionsEl.querySelectorAll("button");
+  allButtons.forEach(btn => btn.classList.remove("selected"));
+  button.classList.add("selected");
+  selectedOption = index;
+  nextBtn.disabled = false;
+}
+
+nextBtn.addEventListener("click", () => {
+  if (selectedOption === quizData[currentQuestion].answer) {
+    score++;
+  }
+  currentQuestion++;
+  if (currentQuestion < quizData.length) {
+    loadQuestion();
+  } else {
+    showScore();
+  }
+});
+
+function showScore() {
+  questionEl.textContent = "Quiz Completed!";
+  optionsEl.innerHTML = "";
+  nextBtn.style.display = "none";
+  scoreEl.textContent = Your score: ${score} / ${quizData.length};
+
+  const restartBtn = document.createElement("button");
+  restartBtn.textContent = "Restart Quiz 🔁";
+  restartBtn.className = "next-btn";
+  restartBtn.onclick = () => {
+    currentQuestion = 0;
+    score = 0;
+    nextBtn.style.display = "inline-block";
+    loadQuestion();
+    scoreEl.textContent = "";
+    restartBtn.remove();
+  };
+  optionsEl.appendChild(restartBtn);
+}
+
+// Joke Section
+const jokes = [
+  { q: "Why did the scarecrow win an award?", a: "Because he was outstanding in his field." },
+  { q: "Why don’t skeletons fight?", a: "They don’t have the guts." },
+  { q: "What do you call fake spaghetti?", a: "An impasta." },
+  { q: "Why did the math book look sad?", a: "Because it had too many problems." }
+];
+
+function getAnotherJoke() {
+  const joke = jokes[Math.floor(Math.random() * jokes.length)];
+  document.getElementById("joke-q").textContent = joke.q;
+  document.getElementById("joke-a").textContent = joke.a;
+}
+
+// Initial load
+loadQuestion();
